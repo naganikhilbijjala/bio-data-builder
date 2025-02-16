@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { FileText, Users, Download, Shield } from "lucide-react";
 
@@ -160,7 +159,13 @@ export default function Home() {
   );
 }
 
-function FeatureCard({ icon, title, description }) {
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md text-center">
       <div className="flex justify-center mb-4">{icon}</div>
@@ -170,13 +175,19 @@ function FeatureCard({ icon, title, description }) {
   );
 }
 
-function TestimonialCard({ image, name, quote }) {
+interface TestimonialCardProps {
+  image: string;
+  name: string;
+  quote: string;
+}
+
+function TestimonialCard({ name, quote }: TestimonialCardProps) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="flex items-center mb-4">
         <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
       </div>
-      <p className="text-gray-600 italic">"{quote}"</p>
+      <p className="text-gray-600 italic">&quot;{quote}&quot;</p>
     </div>
   );
 }
