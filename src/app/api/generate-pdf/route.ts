@@ -23,19 +23,35 @@ export async function POST(req: Request) {
 
     const { name, dob, imageUrl } = body;
 
-    await page.setContent(`
-             <div style="font-family: Arial, sans-serif; padding: 20px; display: flex; align-items: center;">
-        <div style="flex: 1;">
-          <h1 style="color: #333;">Bio Data</h1>
-          <p><strong>Full Name:</strong> ${name || "Full Name"}</p>
-          <p><strong>Date of Birth:</strong> ${dob || "YYYY-MM-DD"}</p>
-        </div>
-        <div style="margin-left: 20px;">
-          <img src="${imageUrl}" alt="Profile" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
-        </div>
-      </div>
-          `);
-    const pdfBuffer = await page.pdf({ format: "A4" });
+    const template1 = `
+      <div style="
+    width: 794px; 
+    height: 1123px;  
+    margin: 0 auto;
+    background-image: url('http://localhost:3000/transparent-template.png'); 
+    background-size: contain; 
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cursive', serif;
+">
+    <h1 style="color: darkred; font-size: 28px; margin-bottom: 10px;">Bio Data</h1>
+    <img src="${imageUrl}" alt="Profile" style="width: 120px; height: 120px; border-radius: 50%; border: 5px solid darkred;">
+    <p style="font-size: 18px; background: rgba(255, 255, 255, 0.7); padding: 5px;">
+      <strong>Name:</strong> ${name || "Full Name"}
+    </p>
+    <p style="font-size: 18px; background: rgba(255, 255, 255, 0.7); padding: 5px;">
+      <strong>Date of Birth:</strong> ${dob || "YYYY-MM-DD"}
+    </p>
+</div>
+    `;
+
+    await page.setContent(template1);
+    const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
     await browser.close();
     return new Response(pdfBuffer, {
