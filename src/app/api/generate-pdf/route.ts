@@ -1,8 +1,24 @@
 import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 export async function POST(req: Request) {
   try {
-    const browser = await puppeteer.launch();
+    let browser = null;
+    if (process.env.NODE_ENV === "development") {
+      browser = await puppeteer.launch();
+    }
+    if (process.env.NODE_ENV === "production") {
+      browser = await puppeteerCore.launch({
+        executablePath: await chromium.executablePath(),
+        defaultViewport: chromium.defaultViewport,
+        headless: chromium.headless,
+        args: chromium.args,
+      });
+    }
+    if (!browser) {
+      throw new Error("Browser instance is null");
+    }
     const page = await browser.newPage();
     const body = await req.json();
 
