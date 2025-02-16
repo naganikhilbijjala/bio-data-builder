@@ -24,8 +24,8 @@ export async function POST(req: Request) {
     const {
       name,
       dob,
-      timeOfBirth,
-      placeOfBirth,
+      tob,
+      pob,
       rashi,
       nakshatra,
       complexion,
@@ -41,8 +41,8 @@ export async function POST(req: Request) {
     const fields = [
       { label: "Name", value: name },
       { label: "Date of Birth", value: dob },
-      { label: "Time of Birth", value: timeOfBirth },
-      { label: "Place of Birth", value: placeOfBirth },
+      { label: "Time of Birth", value: tob },
+      { label: "Place of Birth", value: pob },
       { label: "Rashi", value: rashi },
       { label: "Nakshatra", value: nakshatra },
       { label: "Complexion", value: complexion },
