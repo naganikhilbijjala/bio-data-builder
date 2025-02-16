@@ -28,7 +28,9 @@ export async function POST(req: Request) {
     width: 794px; 
     height: 1123px;  
     margin: 0 auto;
-    background-image: url('http://localhost:3000/transparent-template.png'); 
+    background-image: url('${
+      process.env.NEXT_PUBLIC_BASE_URL
+    }/transparent-template.png');
     background-size: contain; 
     background-position: center;
     background-repeat: no-repeat;
