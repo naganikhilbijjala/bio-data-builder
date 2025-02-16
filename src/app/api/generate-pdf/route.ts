@@ -10,10 +10,9 @@ export async function POST(req: Request) {
     }
     if (process.env.NODE_ENV === "production") {
       browser = await puppeteerCore.launch({
-        executablePath: await chromium.executablePath(),
-        defaultViewport: chromium.defaultViewport,
-        headless: chromium.headless,
         args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
       });
     }
     if (!browser) {
