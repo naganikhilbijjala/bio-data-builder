@@ -8,19 +8,36 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 
 export default function CreateBioData() {
-  const [name, setName] = useState("");
-  const [dob, setDob] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    dob: "",
+    tob: "",
+    pob: "",
+    rashi: "",
+    nakshtra: "",
+    complexion: "",
+    height: "",
+    education: "",
+    religionCaste: "",
+    jobOccupation: "",
+    income: "",
+    gothram: "",
+    image: null as File | null,
+  });
   const bioDataRef = useRef<HTMLDivElement>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+      setFormData({ ...formData, image: e.target.files[0] });
     }
   };
 
   const handleGeneratePDF = async () => {
-    if (!image) {
+    if (!formData.image) {
       console.error("No image selected");
       return;
     }
@@ -31,9 +48,8 @@ export default function CreateBioData() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          dob,
-          imageUrl: image ? base64Image : null,
+          ...formData,
+          imageUrl: base64Image,
         }),
       });
 
@@ -51,8 +67,24 @@ export default function CreateBioData() {
       link.click();
       document.body.removeChild(link);
     };
-    reader.readAsDataURL(image);
+    reader.readAsDataURL(formData.image);
   };
+
+  const fields = [
+    { name: "name", label: "Full Name", type: "text" },
+    { name: "dob", label: "Date of Birth", type: "date" },
+    { name: "tob", label: "Time of Birth", type: "time" },
+    { name: "pob", label: "Place of Birth", type: "text" },
+    { name: "rashi", label: "Rashi", type: "text" },
+    { name: "nakshatra", label: "Nakshatra", type: "text" },
+    { name: "complexion", label: "Complexion", type: "text" },
+    { name: "height", label: "Height (e.g., 5'9\")", type: "text" },
+    { name: "education", label: "Education", type: "text" },
+    { name: "religionCaste", label: "Religion/Caste", type: "text" },
+    { name: "jobOccupation", label: "Job/Occupation", type: "text" },
+    { name: "income", label: "Income (e.g., $50,000/year)", type: "text" },
+    { name: "gothram", label: "Gothram", type: "text" },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12">
@@ -64,12 +96,13 @@ export default function CreateBioData() {
               Create Your Bio Data
             </h1>
           </div>
+          {/* Display Bio Data */}
           <div ref={bioDataRef} className="p-4 bg-white rounded-md shadow-md">
-            <p className="text-xl font-bold">{name || "Full Name"}</p>
-            <p className="text-gray-600">DOB: {dob || "YYYY-MM-DD"}</p>
-            {image && (
+            <p className="text-xl font-bold">{formData.name || "Full Name"}</p>
+            <p className="text-gray-600">DOB: {formData.dob || "YYYY-MM-DD"}</p>
+            {formData.image && (
               <Image
-                src={URL.createObjectURL(image)}
+                src={URL.createObjectURL(formData.image)}
                 alt="Profile"
                 className="w-24 h-24 rounded-full mt-4"
                 width={96}
@@ -78,26 +111,21 @@ export default function CreateBioData() {
             )}
           </div>
           <div className="space-y-6 mt-6">
-            <div>
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="dob">Date of Birth</Label>
-              <Input
-                id="dob"
-                type="date"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                required
-              />
-            </div>
+            {fields.map((field) => (
+              <div key={field.name}>
+                <Label htmlFor={field.name}>{field.label}</Label>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type={field.type}
+                  value={
+                    formData[field.name as keyof typeof formData] as string
+                  }
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            ))}
             <div>
               <Label htmlFor="image">Upload Photo</Label>
               <div className="mt-1 flex items-center">
@@ -116,7 +144,7 @@ export default function CreateBioData() {
                   Choose file
                 </Label>
                 <span className="ml-3 text-sm text-gray-500">
-                  {image ? image.name : "No file chosen"}
+                  {formData.image ? formData.image.name : "No file chosen"}
                 </span>
               </div>
             </div>
