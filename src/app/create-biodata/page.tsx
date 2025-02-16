@@ -5,8 +5,7 @@ import { FileText, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import Image from "next/image";
 
 export default function CreateBioData() {
   const [name, setName] = useState("");
@@ -21,14 +20,25 @@ export default function CreateBioData() {
   };
 
   const handleGeneratePDF = async () => {
-    if (!bioDataRef.current) return;
+    const response = await fetch("/api/generate-pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, dob }),
+    });
 
-    const canvas = await html2canvas(bioDataRef.current);
-    const imgData = canvas.toDataURL("image/png");
+    if (!response.ok) {
+      console.error("Failed to generate PDF");
+      return;
+    }
 
-    const pdf = new jsPDF("p", "mm", "a4");
-    pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
-    pdf.save("biodata.pdf");
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "biodata.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -45,11 +55,12 @@ export default function CreateBioData() {
             <p className="text-xl font-bold">{name || "Full Name"}</p>
             <p className="text-gray-600">DOB: {dob || "YYYY-MM-DD"}</p>
             {image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={URL.createObjectURL(image)}
                 alt="Profile"
                 className="w-24 h-24 rounded-full mt-4"
+                width={96}
+                height={96}
               />
             )}
           </div>
