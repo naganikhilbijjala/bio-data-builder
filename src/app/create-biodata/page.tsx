@@ -20,25 +20,38 @@ export default function CreateBioData() {
   };
 
   const handleGeneratePDF = async () => {
-    const response = await fetch("/api/generate-pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, dob }),
-    });
-
-    if (!response.ok) {
-      console.error("Failed to generate PDF");
+    if (!image) {
+      console.error("No image selected");
       return;
     }
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result as string;
+      const response = await fetch("/api/generate-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          dob,
+          imageUrl: image ? base64Image : null,
+        }),
+      });
 
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "biodata.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      if (!response.ok) {
+        console.error("Failed to generate PDF");
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "biodata.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+    reader.readAsDataURL(image);
   };
 
   return (
