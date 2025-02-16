@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import puppeteerCore from "puppeteer-core";
-import chromium from "chrome-aws-lambda";
+import chromium from "@sparticuz/chromium";
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     }
     if (process.env.NODE_ENV === "production") {
       browser = await puppeteerCore.launch({
-        executablePath: await chromium.executablePath,
+        executablePath: await chromium.executablePath(),
         defaultViewport: chromium.defaultViewport,
         headless: chromium.headless,
         args: chromium.args,
