@@ -1,11 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FileText, Upload } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import UploadImage from "./UploadImage";
 
 export default function CreateBioData() {
   const [formData, setFormData] = useState({
@@ -28,12 +29,6 @@ export default function CreateBioData() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, image: e.target.files[0] });
-    }
   };
 
   const handleGeneratePDF = async () => {
@@ -126,28 +121,7 @@ export default function CreateBioData() {
                 />
               </div>
             ))}
-            <div>
-              <Label htmlFor="image">Upload Photo</Label>
-              <div className="mt-1 flex items-center">
-                <Input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="sr-only"
-                />
-                <Label
-                  htmlFor="image"
-                  className="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <Upload className="h-4 w-4 text-gray-400 mr-2 inline" />
-                  Choose file
-                </Label>
-                <span className="ml-3 text-sm text-gray-500">
-                  {formData.image ? formData.image.name : "No file chosen"}
-                </span>
-              </div>
-            </div>
+            <UploadImage />
             <Button
               type="button"
               onClick={handleGeneratePDF}
