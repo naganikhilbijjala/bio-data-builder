@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { FileText, Upload } from "lucide-react";
+import { useState } from "react";
+import { FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import UploadImage from "./UploadImage";
 
 export default function CreateBioData() {
   const [formData, setFormData] = useState({
@@ -22,18 +23,17 @@ export default function CreateBioData() {
     jobOccupation: "",
     income: "",
     gothram: "",
-    image: null as File | null,
+    image: "",
   });
-  const bioDataRef = useRef<HTMLDivElement>(null);
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, image: e.target.files[0] });
-    }
+  const handleImageCrop = (croppedImage: string) => {
+    setFormData((prev) => ({ ...prev, image: croppedImage }));
   };
 
   const handleGeneratePDF = async () => {
@@ -41,23 +41,21 @@ export default function CreateBioData() {
       console.error("No image selected");
       return;
     }
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64Image = reader.result as string;
+
+    setLoading(true);
+    try {
       const response = await fetch("/api/generate-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          imageUrl: base64Image,
+          imageUrl: formData.image,
         }),
       });
-
       if (!response.ok) {
         console.error("Failed to generate PDF");
         return;
       }
-
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -66,8 +64,11 @@ export default function CreateBioData() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    };
-    reader.readAsDataURL(formData.image);
+    } catch (error) {
+      console.log("Error generating PDF: ", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fields = [
@@ -96,20 +97,6 @@ export default function CreateBioData() {
               Create Your Bio Data
             </h1>
           </div>
-          {/* Display Bio Data */}
-          <div ref={bioDataRef} className="p-4 bg-white rounded-md shadow-md">
-            <p className="text-xl font-bold">{formData.name || "Full Name"}</p>
-            <p className="text-gray-600">DOB: {formData.dob || "YYYY-MM-DD"}</p>
-            {formData.image && (
-              <Image
-                src={URL.createObjectURL(formData.image)}
-                alt="Profile"
-                className="w-24 h-24 rounded-full mt-4"
-                width={96}
-                height={96}
-              />
-            )}
-          </div>
           <div className="space-y-6 mt-6">
             {fields.map((field) => (
               <div key={field.name}>
@@ -126,34 +113,30 @@ export default function CreateBioData() {
                 />
               </div>
             ))}
-            <div>
-              <Label htmlFor="image">Upload Photo</Label>
-              <div className="mt-1 flex items-center">
-                <Input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="sr-only"
-                />
-                <Label
-                  htmlFor="image"
-                  className="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <Upload className="h-4 w-4 text-gray-400 mr-2 inline" />
-                  Choose file
-                </Label>
-                <span className="ml-3 text-sm text-gray-500">
-                  {formData.image ? formData.image.name : "No file chosen"}
-                </span>
-              </div>
-            </div>
+            <UploadImage onImageCrop={handleImageCrop} />
+            {formData.image && (
+              <Image
+                src={formData.image}
+                alt="Profile"
+                className="w-28 h-28 rounded-full mt-4"
+                width={112}
+                height={112}
+              />
+            )}
             <Button
               type="button"
               onClick={handleGeneratePDF}
-              className="w-full"
+              className="w-full flex items-center justify-center"
+              disabled={loading}
             >
-              Generate PDF
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin h-5 w-5 mr-2" />{" "}
+                  Processing...
+                </>
+              ) : (
+                "Generate PDF"
+              )}
             </Button>
           </div>
         </div>
