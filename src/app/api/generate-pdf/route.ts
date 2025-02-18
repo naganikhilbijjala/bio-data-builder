@@ -65,12 +65,13 @@ export async function POST(req: Request) {
         display: flex; flex-direction: column; align-items: center; font-family: 'Cursive', serif;">
         
         <h1 style="color: darkred; font-size: 28px; margin-top: 120px; margin-bottom: 10px;">Bio Data</h1>
-        <img src="${imageUrl}" alt="Profile" style="width: 120px; height: 120px;
-          border-radius: 50%; border: 5px solid darkred;">
-        
-        <div style="font-size: 18px; padding: 10px; width: 70%;">
-          ${fields}
-        </div>
+        <div style="display: flex; width: 70%; align-items: center; justify-content: space-between; padding: 15px;">
+      <div style="flex: 1; font-size: 18px;">
+        ${fields}
+      </div>
+      <img src="${imageUrl}" alt="Profile" style="width: 180px; height: 180px;
+        border-radius: 50%; border: 5px solid darkred;">
+    </div>
       </div>
     `;
 

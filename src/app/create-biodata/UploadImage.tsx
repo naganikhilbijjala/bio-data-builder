@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import CropperComponent from "./Cropper";
 import {
   Dialog,
@@ -14,10 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-const UploadImage = () => {
+interface UploadImageProps {
+  onImageCrop: (croppedImage: string) => void;
+}
+
+const UploadImage = ({ onImageCrop }: UploadImageProps) => {
   // Use appropriate types for states
   const [imageSrc, setImageSrc] = useState<string | null>(null); // Image source (base64 string)
-  const [croppedImage, setCroppedImage] = useState<string | null>(null); // Cropped image
   const [showCropper, setShowCropper] = useState<boolean>(false); // Flag to show cropper
 
   // Image file selection handler (event is of type React.ChangeEvent<HTMLInputElement>)
@@ -37,47 +39,47 @@ const UploadImage = () => {
 
   // Handle the crop result (cropped image as a base64 string)
   const handleCropDone = (cropped: string) => {
-    setCroppedImage(cropped);
+    onImageCrop(cropped);
     setShowCropper(false);
   };
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <Button>Upload Photo</Button>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="px-6 py-2 text-sm font-medium">
+          Upload Photo
+        </Button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogTitle>Choose Image</DialogTitle>
+      <DialogContent className="max-w-md">
+        <DialogTitle className="text-lg font-semibold">
+          Choose Image
+        </DialogTitle>
         <DialogDescription>
-          <div className="p-4">
-            <Label htmlFor="image"></Label>
-            <Input
-              id="image"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="mb-4"
-            />
+          <div className="p-4 space-y-4">
+            {/* Styled File Input */}
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <Label
+                htmlFor="image"
+                className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                Choose File
+              </Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </div>
 
+            {/* Image Cropper */}
             {showCropper && imageSrc && (
               <CropperComponent
                 imageSrc={imageSrc}
                 onCropDone={handleCropDone}
                 onCancel={() => setShowCropper(false)}
               />
-            )}
-
-            {croppedImage && (
-              <div className="mt-4">
-                <h3 className="mb-2">Cropped Image:</h3>
-                <Image
-                  src={croppedImage}
-                  alt="Cropped"
-                  width={128}
-                  height={128}
-                  className="rounded-full"
-                />
-              </div>
             )}
           </div>
         </DialogDescription>

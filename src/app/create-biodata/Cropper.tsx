@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Cropper, { Area } from "react-easy-crop";
 import { getCroppedImg } from "@/utils/cropImage";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 
 interface CropperComponentProps {
   imageSrc: string;
@@ -41,12 +42,21 @@ const CropperComponent = ({
           image={imageSrc}
           crop={crop}
           zoom={zoom}
-          aspect={1} // Square crop (for circle display, use rounded borders)
+          cropShape="round"
+          aspect={1}
           onCropChange={setCrop}
           onZoomChange={setZoom}
           onCropComplete={onCropComplete}
         />
       </div>
+      <Slider
+        className="mt-4"
+        min={1}
+        max={3}
+        step={0.1}
+        value={[zoom]}
+        onValueChange={(value) => setZoom(value[0])}
+      />
       <div className="mt-4 absolute left-1/2 transform -translate-x-1/2 flex space-x-4">
         <Button
           onClick={handleCrop}
