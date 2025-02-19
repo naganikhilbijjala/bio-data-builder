@@ -19,6 +19,7 @@ interface UploadImageProps {
 
 const UploadImage = ({ onImageCrop }: UploadImageProps) => {
   // Use appropriate types for states
+  const [open, setOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null); // Image source (base64 string)
   const [showCropper, setShowCropper] = useState<boolean>(false); // Flag to show cropper
 
@@ -41,10 +42,11 @@ const UploadImage = ({ onImageCrop }: UploadImageProps) => {
   const handleCropDone = (cropped: string) => {
     onImageCrop(cropped);
     setShowCropper(false);
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="px-6 py-2 text-sm font-medium">
           Upload Photo
